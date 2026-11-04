@@ -7,7 +7,7 @@
 float ls[3] = {0, 2, -10};
 float cam_position[3] = {0, 0, 0};
 Camera camera = Camera(cam_position);
-Renderer r = Renderer(640, 320, ls, camera);
+Renderer r = Renderer(320, 160, ls, camera);
 Torus t, t2;
 Cube c;
 Terrain test;
@@ -79,7 +79,7 @@ int main() {
 */
   test.generate(2, 2, 2);
   r.add_shape(&test);
-  test.translate(-10, -10, -10);
+  test.translate(-10, -30, -10);
   std::thread t_in(thread_input);
   std::thread t_out(thread_output);
 

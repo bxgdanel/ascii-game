@@ -84,5 +84,5 @@ float Cube::get_distance(vector<float> p) const {
   return out_dist + in_dist;
 }
 float Terrain::get_distance(vector<float> p) const {
-  return p[1] - sin(p[0]) - cos(p[2]);
+  return p[1] - center[1] - sin(p[0] - center[0]) - cos(p[2] - center[2]);
 }

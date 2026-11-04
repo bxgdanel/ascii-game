@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "Camera.h"
 #include "domain.h"
+#include <iostream>
 #include <iterator>
 #include <stdio.h>
 #include <unistd.h>
@@ -23,14 +24,16 @@ Renderer::Renderer(int w, int h, float ls[3], Camera camera) {
   this->camera = camera;
 }
 void Renderer::print_buffer() {
-  for (int y = H_size - 1; y >= 0; y--, printf("\n"))
-    for (int x = 0; x < W_size - 1; x++, printf(" ")) {
+  string disp = "";
+  for (int y = H_size - 1; y >= 0; y--) {
+    for (int x = 0; x < W_size - 1; x++) {
       // printf("%c", printvals[a[x][y]]);
-      if (printvals[a[x][y]] != printvals[b[x][y]]) {
-        setCursorPosition(x, y);
-        printf("%c", printvals[a[x][y]]);
-      }
+      disp += printvals[a[x][y]];
+      disp += " ";
     }
+    disp += '\n';
+  }
+  std::cout << disp;
 }
 void Renderer::ResetDepthBuffer() {
   for (int x = 0; x < W_size; x++)
@@ -42,7 +45,6 @@ void Renderer::setCursorPosition(int x, int y) {
   fflush(stdout);
 }
 void Renderer::render() {
-  b = a;
   for (int y = 0; y < H_size; y++)
     for (int x = 0; x < W_size; x++) {
       Ray ray = camera.get_ray(x, y, W_size, H_size);
