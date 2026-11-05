@@ -1,70 +1,97 @@
 #include "Camera.h"
 #include "domain.h"
 #include "renderer.h"
+#include <mutex>
 #include <termios.h>
 #include <thread>
 #include <unistd.h>
+#define width 320
+#define height 160
 float ls[3] = {0, 2, -10};
 float cam_position[3] = {0, 0, 0};
-Camera camera = Camera(cam_position);
-Renderer r = Renderer(640, 320, ls, camera);
-Terrain test;
+Camera camera = Camera(cam_position, width, height);
+Renderer r = Renderer(width, height, ls, camera);
+std::mutex mtx;
 
 char readKey() {
   struct termios oldt, newt;
-  char ch;
+
   tcgetattr(STDIN_FILENO, &oldt);
+
   newt = oldt;
-  newt.c_lflag &= ~(ICANON | ECHO);
+  newt.c_lflag &=
+      ~(ICANON | ECHO); // dezactiveaza ICANON => nu mai foloseste buffer,
+                        // ECHO => nu se mai afiseaza in terminal
+
   tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  ch = getchar();
+  char ch = getchar();
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
   return ch;
 }
-float input_buf[3];
-int input_rot = 0, input_d = 0;
 void thread_input() {
+  float input_buf[3];
+  int input_rot = 0, input_d = 0;
   while (true) {
     input_buf[0] = 0;
     input_buf[1] = 0;
     input_buf[2] = 0;
     char c = readKey();
-    if (c == 'w')
+    switch (c) {
+    case 'w':
       input_buf[2] = 1;
-    else if (c == 's')
+      break;
+    case 's':
       input_buf[2] = -1;
-    else if (c == 'a')
+      break;
+    case 'a':
       input_buf[0] = -1;
-    else if (c == 'd')
+      break;
+    case 'd':
       input_buf[0] = 1;
-    else if (c == ' ')
+      break;
+    case ' ':
       input_buf[1] = 1;
-    else if (c == 'm')
+      break;
+    case 'm':
       input_buf[1] = -1;
-    else if (c == '[')
+      break;
+    case '[':
       input_rot -= 15;
-    else if (c == ']')
+      break;
+    case ']':
       input_rot += 15;
-    else if (c == 'h') {
+      break;
+    case 'h':
       input_d -= 15;
       if (input_d < -85)
         input_d = -85;
-    } else if (c == 'y') {
+      break;
+    case 'y':
       input_d += 15;
       if (input_d > 85)
         input_d = 85;
+      break;
     }
+    mtx.lock();
     r.getCamera().move(input_buf);
     r.getCamera().rotation_angle = input_rot;
     r.getCamera().down_angle = input_d;
+    mtx.unlock();
   }
 }
 void thread_output() {
   while (true) {
-    r.display();
+    mtx.lock();
+    Camera snap = r.getCamera();
+    mtx.unlock();
+
+    r.display(snap);
   }
 }
+
 int main() {
+  Terrain test;
   test.generate(2, 2, 2);
   r.add_shape(&test);
   test.translate(-10, -30, -10);

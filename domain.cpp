@@ -18,6 +18,7 @@ void Surface::get_normal(float p[3], float n[3]) const {
     n[2] /= len;
   }
 }
+
 bool Surface::intersect(Ray &ray, float &t, float norm[]) const {
   float t_curent = 0.0f;
   const int MAX_STEPS = 80;
@@ -40,6 +41,7 @@ bool Surface::intersect(Ray &ray, float &t, float norm[]) const {
   }
   return false;
 }
+
 float Terrain::get_distance(float x, float y, float z) const {
-  return y - center[1] - sin(x - center[0]) - cos(z - center[2]);
+  return (y - center[1] - sin(x - center[0]) - cos(z - center[2])) / 1.7321f;
 }
