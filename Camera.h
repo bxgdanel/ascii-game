@@ -8,6 +8,7 @@ struct Ray {
 };
 class Camera {
 private:
+  float sin_x, cos_x, sin_z, cos_z;
   void rotate_y_by_angle(float p[3], float angle) {
     float angleRadians = angle * static_cast<float>(M_PI) / 180.0f;
 

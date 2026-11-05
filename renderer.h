@@ -4,22 +4,24 @@
 #include <string>
 #include <tuple>
 #include <vector>
+using std::string;
 using std::vector;
 class Renderer {
 protected:
   int W_size, H_size;
   vector<vector<int>> a;
-  vector<vector<int>> b;
-  vector<vector<float>> zbuf;
+  // vector<vector<int>> b;
+  // vector<vector<float>> zbuf;
   vector<const Surface *> shapes;
   float light_source[3];
   Camera camera;
+  char disp[205500];
   const std::string printvals = " .,-~:;=!*#$%@";
   const int printvals_len = 14;
   void print_buffer();
-  virtual void ResetDepthBuffer();
+  void ResetDepthBuffer();
   void setCursorPosition(int x, int y);
-  virtual void render();
+  void render();
   void task(int y);
 
 public:

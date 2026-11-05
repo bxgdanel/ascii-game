@@ -7,9 +7,7 @@
 float ls[3] = {0, 2, -10};
 float cam_position[3] = {0, 0, 0};
 Camera camera = Camera(cam_position);
-Renderer r = Renderer(320, 160, ls, camera);
-Torus t, t2;
-Cube c;
+Renderer r = Renderer(640, 320, ls, camera);
 Terrain test;
 
 char readKey() {
@@ -56,7 +54,6 @@ void thread_input() {
       if (input_d > 85)
         input_d = 85;
     }
-    // r.getCamera().setPosition(input_buf);
     r.getCamera().move(input_buf);
     r.getCamera().rotation_angle = input_rot;
     r.getCamera().down_angle = input_d;
@@ -65,18 +62,9 @@ void thread_input() {
 void thread_output() {
   while (true) {
     r.display();
-    t.rotate_x(10 * 3.14 / 180);
-    t2.rotate_x(-10 * 3.14 / 180);
   }
 }
 int main() {
-  /*t.generate(6, 3);
-  t2.generate(6, 3);
-  r.add_shape(&t);
-  r.add_shape(&t2);
-  t.translate(-10, 0, 30);
-  t2.translate(10, 0, 30);
-*/
   test.generate(2, 2, 2);
   r.add_shape(&test);
   test.translate(-10, -30, -10);

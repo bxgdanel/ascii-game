@@ -14,7 +14,6 @@ Renderer::Renderer(int w, int h, float ls[3], Camera camera) {
   light_source[2] = ls[2];
 
   a.resize(W_size, vector<int>(H_size, 0));
-  zbuf.resize(W_size, vector<float>(H_size, 0.0f));
 
   float we = sqrt(pow(light_source[0], 2) + pow(light_source[1], 2) +
                   pow(light_source[2], 2));
@@ -24,27 +23,27 @@ Renderer::Renderer(int w, int h, float ls[3], Camera camera) {
   this->camera = camera;
 }
 void Renderer::print_buffer() {
-  string disp = "";
+  int index = 0;
   for (int y = H_size - 1; y >= 0; y--) {
     for (int x = 0; x < W_size - 1; x++) {
-      // printf("%c", printvals[a[x][y]]);
-      disp += printvals[a[x][y]];
-      disp += " ";
+      disp[index++] = printvals[a[x][y]];
+      // disp += " ";
     }
-    disp += '\n';
+    disp[index++] = '\n';
   }
-  std::cout << disp;
+  write(STDOUT_FILENO, disp, sizeof(disp));
 }
-void Renderer::ResetDepthBuffer() {
-  for (int x = 0; x < W_size; x++)
-    for (int y = 0; y < H_size; y++)
-      zbuf[x][y] = -1e19;
-}
+
 void Renderer::setCursorPosition(int x, int y) {
-  printf("\033[%d;%dH", y + 1, x + 1);
-  fflush(stdout);
+  char buf[32];
+  int len = snprintf(buf, sizeof(buf), "\033[%d;%dH", y + 1, x + 1);
+
+  if (len > 0) {
+    write(STDOUT_FILENO, buf, len);
+  }
 }
 void Renderer::render() {
+
   for (int y = 0; y < H_size; y++)
     for (int x = 0; x < W_size; x++) {
       Ray ray = camera.get_ray(x, y, W_size, H_size);
@@ -90,7 +89,6 @@ void Renderer::render() {
 
 void Renderer::display() {
   setCursorPosition(0, 0);
-  ResetDepthBuffer();
   render();
   print_buffer();
 }
